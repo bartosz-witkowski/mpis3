@@ -103,16 +103,6 @@ object Dot2 {
 }
 
 object Dot3 {
-
-  /*
-  inline def dot[A](
-      l: Array[A], 
-      r: Array[A], 
-      sn: StagedNumeric[A]): A = {
-    ${dotExpr('l, 'r, 'sn)}
-  }
-  */
-
   def dotExpr[A](
       l: Expr[Array[A]], 
       r: Expr[Array[A]])(using Quotes, Type[A], StagedNumeric[A]): Expr[A] = Log('{
@@ -158,7 +148,60 @@ object Dot3 {
 }
 
 // Dot3 with friendlier syntax
+//
 object Dot4 {
+  def dotExpr[A](
+      l: Expr[Array[A]], 
+      r: Expr[Array[A]])(using Quotes, Type[A], StagedNumeric[A]): Expr[A] = Log('{
+    val lSize = $l.size
+    val rSize = $r.size
+
+    if (lSize == rSize) {
+      ${ doDotExpr(l, r) }
+    } else {
+      throw new RuntimeException("Arrays must have the same size (got ${lSize} ${rSize})")
+    }
+  })
+
+  private def doDotExpr[A](
+      l: Expr[Array[A]], 
+      r: Expr[Array[A]])(
+      using qctx: Quotes,
+      typeA: Type[A],
+      sn: StagedNumeric[A]): Expr[A] = {
+
+    '{
+      val left = $l
+      val right = $r
+
+      var i = 0
+      var sum: A = ${sn.zero}
+
+      while (i < left.size) {
+        val l: A = left(i)
+        val r: A = right(i)
+
+        sum = ${ 'sum + ('l * 'r) }
+
+        i += 1
+      }
+
+      sum
+    }
+  }
+
+  extension [A](using 
+      qctx: Quotes, 
+      sn: StagedNumeric[A])(l: Expr[A]) {
+    def *(r: Expr[A]): Expr[A] = sn.times(l)(r)
+    def +(r: Expr[A]): Expr[A] = sn.plus(l)(r)
+  }
+
+  abstract class StagedNumeric[A] {
+    def zero(using Quotes): Expr[A]
+    def plus(using Quotes): Expr[A] => Expr[A] => Expr[A]
+    def times(using Quotes): Expr[A] => Expr[A] => Expr[A]
+  }
 }
 
 // Dot4 for any data/accumulator
