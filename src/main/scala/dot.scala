@@ -102,6 +102,9 @@ object Dot2 {
   }
 }
 
+/*
+ * Dot product for a generic type A using typeclasses.
+ */
 object Dot3 {
   def dotExpr[A](
       l: Expr[Array[A]], 
@@ -147,8 +150,9 @@ object Dot3 {
   }
 }
 
-// Dot3 with friendlier syntax
-//
+/*
+ * Dot3 with friendlier syntax
+ */
 object Dot4 {
   def dotExpr[A](
       l: Expr[Array[A]], 
@@ -190,11 +194,9 @@ object Dot4 {
     }
   }
 
-  extension [A](using 
-      qctx: Quotes, 
-      sn: StagedNumeric[A])(l: Expr[A]) {
-    def *(r: Expr[A]): Expr[A] = sn.times(l)(r)
-    def +(r: Expr[A]): Expr[A] = sn.plus(l)(r)
+  extension [A](l: Expr[A]) {
+    def *(using q: Quotes, sn: StagedNumeric[A])(r: Expr[A]): Expr[A] = sn.times(l)(r)
+    def +(using q: Quotes, sn: StagedNumeric[A])(r: Expr[A]): Expr[A] = sn.plus(l)(r)
   }
 
   abstract class StagedNumeric[A] {
@@ -204,8 +206,67 @@ object Dot4 {
   }
 }
 
-// Dot4 for any data/accumulator
+/* 
+ * Dot4 for any data/accumulator
+ */
 object Dot5 {
+  def dotExpr[A, B](
+      l: Expr[Array[A]], 
+      r: Expr[Array[A]])(using Quotes, Type[A], Type[B], StagedNumeric[A], StagedNumeric[B], StagedPromote[A, B]): Expr[B] = Log('{
+    val lSize = $l.size
+    val rSize = $r.size
+
+    if (lSize == rSize) {
+      ${ doDotExpr(l, r) }
+    } else {
+      throw new RuntimeException("Arrays must have the same size (got ${lSize} ${rSize})")
+    }
+  })
+
+  private def doDotExpr[A, B](
+      l: Expr[Array[A]], 
+      r: Expr[Array[A]])(
+      using qctx: Quotes,
+      typeA: Type[A],
+      typeB: Type[B],
+      na: StagedNumeric[A],
+      nb: StagedNumeric[B],
+      promote: StagedPromote[A, B]): Expr[B] = {
+
+    '{
+      val left = $l
+      val right = $r
+
+      var i = 0
+      var sum: B = ${nb.zero}
+
+      while (i < left.size) {
+        val l: A = left(i)
+        val r: A = right(i)
+
+        sum = ${ 'sum + promote('l * 'r) }
+
+        i += 1
+      }
+
+      sum
+    }
+  }
+  
+  extension [A](l: Expr[A]) {
+    def *(using q: Quotes, sn: StagedNumeric[A])(r: Expr[A]): Expr[A] = sn.times(l)(r)
+    def +(using q: Quotes, sn: StagedNumeric[A])(r: Expr[A]): Expr[A] = sn.plus(l)(r)
+  }
+
+  abstract class StagedNumeric[A] {
+    def zero(using Quotes): Expr[A]
+    def plus(using Quotes): Expr[A] => Expr[A] => Expr[A]
+    def times(using Quotes): Expr[A] => Expr[A] => Expr[A]
+  }
+
+  abstract class StagedPromote[A, B] {
+    def apply(using Quotes): Expr[A] => Expr[B]
+  }
 }
 
 /*
