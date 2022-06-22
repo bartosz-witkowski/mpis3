@@ -5,7 +5,7 @@ import scala.quoted.*
 /*
  * From: https://dotty.epfl.ch/docs/reference/metaprogramming/macros.html#lifting-expressions
  */
-object AdtCompiler {
+object AdtCompiler1 {
   enum Exp {
     case Num(n: Int)
     case Plus(e1: Exp, e2: Exp)
