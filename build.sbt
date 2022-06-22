@@ -37,17 +37,3 @@ lazy val power2 = mkProject("pow2", "power/power-2")
 // regexp --{
 lazy val regexp1 = mkProject("regexp1", "regexp/regexp-1")
 // }
-
-
-/*
-lazy val root = project
-  .in(file("."))
-  .settings(
-    name := "mpis3",
-    version := "0.1.0-SNAPSHOT",
-    scalaVersion := scala3Version,
-    libraryDependencies ++= List(
-      "org.scala-lang" %% "scala3-staging" % scalaVersion.value,
-      "com.novocode" % "junit-interface" % "0.11" % "test")
-  )
-*/
