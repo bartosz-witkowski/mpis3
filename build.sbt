@@ -29,6 +29,7 @@ lazy val dot3 = mkProject("dot3", "dot/dot-3")
 lazy val dot4 = mkProject("dot4", "dot/dot-4")
 lazy val dot5 = mkProject("dot5", "dot/dot-5")
 lazy val dot6 = mkProject("dot6", "dot/dot-6")
+lazy val dot7 = mkProject("dot7", "dot/dot-7")
 // }
 // power --{
 lazy val power1 = mkProject("pow1", "power/power-1")

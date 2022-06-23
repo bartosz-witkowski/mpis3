@@ -10,3 +10,4 @@ Starting from the idea from: https://github.com/nicolasstucki/scala-metaprogramm
   * [dot-4](dot-3) dot-3 with friendlier syntax
   * [dot-5](dot-5) dot-4 for any data/accumultor type
   * [dot-6](dot-6) dot-5 using the vector api
+  * [dot-7](dot-7) dot-6 without the duplication in macro implementation
