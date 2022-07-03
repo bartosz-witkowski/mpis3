@@ -109,8 +109,8 @@ BenchmarkTiny.stagedWithCompilation        32           50  thrpt   25       176
 BenchmarkTiny.stagedWithCompilation        32          100  thrpt   25       173.451       5.081   ops/s
 ```
 
-[[bench-1.png]]
-[[bench-2.png]]
-[[bench-5.png]]
-[[bench-50.png]]
-[[bench-100.png]]
+![benchmark rc=1](bench-1.png?raw=true "Benchmark rightsCount=1")
+![benchmark rc=2](bench-2.png?raw=true "Benchmark rightsCount=2")
+![benchmark rc=5](bench-5.png?raw=true "Benchmark rightsCount=5")
+![benchmark rc=50](bench-50.png?raw=true "Benchmark rightsCount=50")
+![benchmark rc=100](bench-100.png?raw=true "Benchmark rightsCount=100")
