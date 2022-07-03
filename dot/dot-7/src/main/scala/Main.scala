@@ -3,7 +3,7 @@ package mpis3
 import scala.quoted.*
 import scala.quoted.staging
 import scala.quoted.staging.Compiler
-import Dot6._
+import Dot7._
 import jdk.incubator.vector.{IntVector, VectorOperators}
 
 object Main {
@@ -61,7 +61,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val r = staging.run[Long] { 
-      Dot6.dotExpr[Int, Long](
+      Dot7.dotExpr[Int, Long](
         //Expr(Array(1)),
         Expr(Array(1, 3, -5,  1, 3, -5,  1, 3)), 
         //Expr(Array(1)))

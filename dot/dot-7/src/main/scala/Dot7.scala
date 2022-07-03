@@ -4,8 +4,6 @@ import scala.quoted.*
 import scala.reflect.ClassTag
 import Instances.given
 
-case class StagedVar()
-
 object Dot7 {
   def dotExpr[A, B](
         l: Expr[Array[A]], 
@@ -42,18 +40,22 @@ object Dot7 {
       var i = 0
       var sum: B = ${nb.zero}
 
-      val bound: Int = ${na.loopBound(Expr(_left.length))}
+      ${ 
+        if (_left.size > vectorLength) '{
+          val bound: Int = ${na.loopBound(Expr(_left.length))}
 
-      while (i < bound) {
-        val l: na.Vector = ${na.vectorFromArray('left)('i)}
-        val r: na.Vector = ${na.vectorFromArray('right)('i)}
-        
-        val vmul = ${na.mul('l)('r)}
-        sum = ${ 'sum + promote(na.sum('vmul)) }
+          while (i < bound) {
+            val l: na.Vector = ${na.vectorFromArray('left)('i)}
+            val r: na.Vector = ${na.vectorFromArray('right)('i)}
+            
+            val vmul = ${na.mul('l)('r)}
+            sum = ${ 'sum + promote(na.sum('vmul)) }
 
-        i += ${ na.vectorLength }
+            i += ${ na.vectorLength }
+          }
+        } else '{
+        }
       }
-
       ${
         if (_left.size % vectorLength == 0) '{
           while (i < ${Expr(_left.size)}) {
