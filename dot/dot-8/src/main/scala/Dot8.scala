@@ -46,7 +46,6 @@ object Dot8 {
   def dotExpr[A, B](
         l: Expr[Array[A]], 
         r: Expr[Array[A]])(using Quotes, Type[A], FromExpr[A], ToExpr[Array[A]], ToExpr[A], ClassTag[A], Type[B], StagedVectorized[A], StagedNumeric[B], StagedPromote[A, B]): Expr[B] = {
-      // does this even make sense? we would ideally want to call it for a known l and many unknown r-s?
       val lArray: StagedValue[Array[A]] = StagedValue(l)
       val rArray: StagedValue[Array[A]] = StagedValue(r)
       
@@ -84,7 +83,14 @@ object Dot8 {
       }
       ${
         if (sizeOption.map(_ >= vectorLength).getOrElse(true)) '{
-          val bound: Int = ${na.loopBound('{ ${leftStaged.expr}.size }) }
+          val bound: Int = ${
+            sizeOption match {
+              case Some(size) =>
+                na.loopBound(Expr(size))
+              case None =>
+                na.loopBound('{left.size})
+            }
+          }
           
           while (i < bound) {
             val l: na.Vector = ${na.vectorFromArray('left)('i)}

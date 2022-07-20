@@ -20,11 +20,14 @@ plot_score <- function(dat) {
   geom_errorbar() +
   ylab("ops/s") +
   xlab("Benchmark") +
-  facet_wrap(facets = vars(arraySize), labeller = "label_both") +
+  facet_wrap(facets = vars(arraySize), labeller = "label_both", scales = "free") +
   ggtitle(paste("rightsCount=", rc, sep=""))
 
   ggsave(
-    filename = paste("bench-", rc, ".png", sep=""))
+    filename = paste("bench-", rc, ".png", sep=""),
+    width = 2 * 39.8,
+    height = 2 * 22.4,
+    units = "cm")
 }
 
 lapply(split.bench.data, plot_score)

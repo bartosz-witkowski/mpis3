@@ -7,6 +7,10 @@ import Dot8._
 import jdk.incubator.vector.{IntVector, VectorOperators}
 
 object StagedDot {
+  // Uncomment to debug the generated code
+  //given settings: Compiler.Settings = Compiler.Settings.make(outDir = Some("/tmp/test"))
+  //
+
   given Compiler = Compiler.make(StagedDot.getClass.getClassLoader)
 
   given StagedVectorized[Int] = new StagedVectorized[Int] {
@@ -59,13 +63,19 @@ object StagedDot {
     }
   }
 
-  def stage(lhs: Array[Int]): Array[Int] => Long = {
-    staging.run {
-      val expr: Expr[Array[Int] => Long] = '{ (rhs : Array[Int]) =>
-        ${
-          Dot8.dotExpr[Int, Long](
-            Expr(lhs),
-            'rhs)
+  def staged(left: Array[Int]): Array[Int] => Long = {
+    val f = staging.run {
+      val expr: Expr[Array[Int] => Long] = {
+        '{
+          val lhs: Array[Int] = ${Expr(left)}
+
+          { (rhs : Array[Int]) =>
+            ${
+              Dot8.dotExpr[Int, Long](
+                'lhs,
+                'rhs)
+            }
+          }
         }
       }
 
@@ -73,12 +83,14 @@ object StagedDot {
 
       expr
     }
+
+    f
   }
 }
 
 object Main {
   def main(args: Array[String]): Unit = {
-    val f: Array[Int] => Long = StagedDot.stage(Array(1, 3, -5,  1, 3, -5,  1, 3))
+    val f: Array[Int] => Long = StagedDot.staged(Array(1, 3, -5,  1, 3, -5,  1, 3))
 
     val r1 = f(Array(4, -2, -1, 4, -2, -1, 4, -2))
     val r2 = f(Array(-2, -1, 4, -2, -1, 4, -2, 4))
