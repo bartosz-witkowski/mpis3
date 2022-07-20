@@ -34,7 +34,7 @@ class BenchmarkTiny {
     }
 
     left = newRandomArray
-    precompiledDot = StagedDot.stage(left)
+    precompiledDot = StagedDot.staged(left)
 
     rhs = new Array[Array[Int]](rightsCount)
     
@@ -65,7 +65,7 @@ class BenchmarkTiny {
 
   @Benchmark 
   def stagedWithCompilation(blackhole: Blackhole): Unit = {
-    val f = StagedDot.stage(left)
+    val f = StagedDot.staged(left)
     
     var i = 0
     while (i < rightsCount) {
